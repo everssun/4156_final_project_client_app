@@ -68,17 +68,17 @@ def admin_logout():
     
 @app.route('/add_company')
 def add_company():
-    global data
-    return render_template('add_company.html', d=data)
+    global company_data
+    return render_template('add_company.html', d=company_data)
 
 @app.route('/add_susbscription')
 def add_susbcription():
-    global data
-    return render_template('add_subscription.html', d=data)
+    global subscription_data
+    return render_template('add_subscription.html', d=subscription_data)
 
 @app.route('/save_data_company', methods=['GET', 'POST'])
 def save_data_company():
-    global company_datadata
+    global company_data
     global company_id
     
     json_data = request.get_json()
@@ -91,10 +91,10 @@ def save_data_company():
         "cname": cname,
         "email": email
     }
-    data[str(company_id)]=new_name_entry
+    company_data[str(company_id)]=new_name_entry
 
     # send back the WHOLE array of data, so the client can redisplay it
-    return jsonify(data=data, id_add = str(company_id))
+    return jsonify(data=company_data, id_add = str(company_id))
 
 @app.route('/save_data_subscription', methods=['GET', 'POST'])
 def save_data_subscription():
@@ -119,10 +119,10 @@ def save_data_subscription():
         "sdate": sdate,
         "binfo": binfo
     }
-    data[str(subscription_id)]=new_name_entry
+    subscription_data[str(subscription_id)]=new_name_entry
 
     # send back the WHOLE array of data, so the client can redisplay it
-    return jsonify(data=data, id_add = str(subscription_id))
+    return jsonify(data=subscription_data, id_add = str(subscription_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
