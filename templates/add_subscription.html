@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12" id="success"></div>
+
+    <div class="col-md-12 big1">Enter the subscription's Info:</div>
+
+    <div class="col-md-1 bold">Company Id: </div>
+    <div class="col-md-11">
+        <input id="cid" type="text" placeholder="company id"/>
+    </div><br>
+    <div class="col-md-12 upb"></div>
+
+    <div class="col-md-1 bold">Subscription Type: </div>
+    <div class="col-md-11">
+        <input id="subtype" type="text" placeholder="subscription type"/>
+    </div><br>
+    <div class="col-md-12 upb"></div>
+
+    <div class="col-md-1 bold">Subscription Status: </div>
+    <div class="col-md-11">
+        <input id="substa" type="text" size="50" placeholder="subscription status"/>
+    </div>
+    <div class="col-md-12 upb"></div>
+
+    <div class="col-md-1 bold">Next Due Date: </div>
+    <div class="col-md-11">
+        <input id="nddate" type="text" size="30" placeholder="YYYY-MM-DD hh-mm-ss"/>
+    </div>
+    <div class="col-md-12 upb"></div>
+
+    <div class="col-md-1 bold">Start_date: </div>
+    <div class="col-md-11">
+        <input id="sdate" type="text" size="30" placeholder="YYYY-MM-DD hh-mm-ss"/>
+    </div>
+    <div class="col-md-12 upb"></div>
+
+    <div class="col-md-1 bold">Billing Info: </div>
+    <div class="col-md-11">
+        <input id="binfo" type="text" size="30" placeholder="billing info"/>
+    </div>
+    <div class="col-md-12 upb"></div>
+
+    <div class="col-md-12">
+        <button id="submit2" class="btn btn-primary fixed">Submit</button>
+    </div>
+</div>
+{% endblock %}
