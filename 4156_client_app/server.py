@@ -1,8 +1,11 @@
-from flask import Flask
+from flask import Flask, redirect, url_for, session
 from flask import render_template
 from flask import Response, request, jsonify
 
 app = Flask(__name__)
+
+admin_credentials = {'username': 'admin', 'password': '123456'}
+app.secret_key = 'debugTeam'  
 
 current_id = 10
 
@@ -86,6 +89,35 @@ data = {
 @app.route('/')
 def hello_world():
     return render_template('welcome.html')
+
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        # Retrieve form data
+        entered_username = request.form['username']
+        entered_password = request.form['password']
+
+        # Check if entered credentials match the dummy admin credentials
+        if entered_username == admin_credentials['username'] and entered_password == admin_credentials['password']:
+            session['authenticated'] = True
+            return redirect(url_for('admin_center'))
+        else:
+            # Render the login page with an error message
+            return render_template('admin_login.html', error='Invalid username or password')
+
+    # Render the login page for GET requests
+    return render_template('admin_login.html', error=None)
+   
+@app.route('/admin-center')
+def admin_center():
+    if not session.get('authenticated'):
+        return redirect(url_for('admin_login'))
+    return render_template('admin_center.html')
+
+@app.route('/admin-logout')
+def admin_logout():
+    session.pop('authenticated', None)
+    return redirect(url_for('admin_login'))
 
 @app.route('/add_company')
 def add_company():

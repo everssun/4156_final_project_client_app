@@ -28,3 +28,14 @@
 .big3{font-weight: bold; font-size: 20px;}
 .bm{margin-bottom: 20px;}
 .padding{padding-top: 10px; padding-bottom: 10px;}
+.jumbotron {
+    background-image: url('images/banner.webp'); 
+    background-size: cover;
+    color: #ffffff;
+    padding: 100px 0;
+    height: 800px
+}
+.navbar-custom {
+    background-color: #1e2a78; 
+}
+

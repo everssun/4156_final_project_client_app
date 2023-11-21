@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+
+<nav class="navbar navbar-dark fixed-top navbar-custom" >
+    <div class="container-fluid">
+        <a class="navbar-brand me-auto" href="#">Admin Center</a>
+     
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link fw-bold" href="/">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container my-5 py-6">
+    <h1>Services: </h1>
+
+    <div class="container">
+        <div class="navbar-nav">
+            <a class="nav-link" href="/add_company">Add Company</a>
+        </div>
+        <br>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/add_susbscription">Add subscription</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
