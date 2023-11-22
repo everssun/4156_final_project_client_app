@@ -22,7 +22,7 @@ function save_data_company(){
             let aa = $("<a>").addClass("nav-link")
             aa.text("See it here")
             //aa.attr('href', "/view/"+add)
-            aa.attr('href', "/view/"+result["id_add"])
+            aa.attr('href', "/view_company/"+result["id_add"])
             newl.append(aa)
             $("#success").append(newl)
         },
@@ -63,7 +63,7 @@ function save_data_subscription(){
             let aa = $("<a>").addClass("nav-link")
             aa.text("See it here")
             //aa.attr('href', "/view/"+add)
-            aa.attr('href', "/view/"+result["id_add"])
+            aa.attr('href', "/view_subs/"+result["id_add"])
             newl.append(aa)
             $("#success").append(newl)
         },

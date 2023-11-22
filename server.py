@@ -76,6 +76,21 @@ def add_susbcription():
     global subscription_data
     return render_template('add_subscription.html', d=subscription_data)
 
+@app.route('/view_company/<id>')
+def view_company(id=None):
+    global company_data
+    i = company_data[id]
+    return render_template('view_company.html', i = i)
+
+@app.route('/view_subs/<id>')
+def view_subscription(id=None):
+    global subscription_data
+    global company_data
+    i = subscription_data[id]
+    cid = subscription_data[id]["cid"]
+    cname = company_data[cid][cname]
+    return render_template('view_subs.html', i = i, name = cname)
+
 @app.route('/save_data_company', methods=['GET', 'POST'])
 def save_data_company():
     global company_data

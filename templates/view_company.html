@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="c2">
+    
+    <div class="big">
+        <p style="text-align: center;">{{i.cname}}</p>
+        <!-- <span class="m">
+            <a href="/edit/{{i.id}}">
+                <button id="edit" class="btn btn-primary fixed">EDIT</button>
+            </a>
+        </span> -->
+    </div>
+
+    <div>
+        <span class="bold">Company Email:</span><br>{{i.email}}
+    </div><br>
+
+</div>
+{% endblock %}
