@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, redirect, url_for, session
 from flask import Response, request, jsonify
+import requests
 
 app = Flask(__name__)
 
@@ -30,8 +31,37 @@ subscription_data = {
         }
 }
 
+# localhost
+service_url = "http://0.0.0.0:3000"
+# JWT token
+jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzI1NzM1NjEsImlzcyI6IlN1Yk1hbmFnZXIiLCJzdWIiOiIyMSJ9.gPSQ91ze5GL4CkCE_sRWyPoQRRcEuQsogoQEJ9cxeQs"
 
 # ROUTES
+
+@app.route('/test')
+def test():
+    headers = {
+        'Authorization': f'Bearer {jwt_token}',
+        'Content-Type': 'application/json',
+    }
+
+    try:
+        # Make a GET request to the external API
+        response = requests.get(service_url+"/company", headers=headers)
+
+        # Check if the request was successful (HTTP status code 200)
+        if response.status_code == 200:
+            # Parse and return the API response
+            api_data = response.content
+            return api_data
+        else:
+            # If the request was not successful, return an error message
+            return jsonify({'error': f'Request failed with status code {response.status_code}'})
+
+    except Exception as e:
+        # Handle any exceptions that may occur during the request
+        return jsonify({'error': str(e)})
+
 
 @app.route('/')
 def hello_world():
