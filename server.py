@@ -101,7 +101,8 @@ def edit_company(id=None):
 def edit_subscription(id=None):
     global subscription_data
     i = subscription_data[id]
-    return render_template('edit_subscription.html', i = i)
+    cname = company_data[i["cid"]]["cname"]
+    return render_template('edit_subscription.html', i = i, cname = cname)
 
 @app.route('/save_data_company', methods=['GET', 'POST'])
 def save_data_company():
@@ -152,7 +153,7 @@ def save_data_subscription():
     return jsonify(data=subscription_data, id_add = str(subscription_id))
 
 @app.route('/edit_company/save_edit', methods=['GET', 'POST'])
-def save_edit():
+def save_edit_comp():
     global company_data
     
     json_data = request.get_json()
@@ -160,22 +161,44 @@ def save_edit():
     name = json_data["name"]
     email = json_data["email"]
 
-    #current_id += 1
-    #new_id = current_id
     new_name_entry = {
         "cid": edit_id,
         "cname": name,
         "email": email
     }
 
-    #print(new_name_entry)
-    #print(edit_id)
-    #print(str(edit_id))
     company_data[str(edit_id)]=new_name_entry
 
     # send back the WHOLE array of data, so the client can redisplay it
     return jsonify(data=company_data, id_edit = str(edit_id))
 
+@app.route('/edit_subscription/save_edit', methods=['GET', 'POST'])
+def save_edit_subs():
+    global subscription_data
+    
+    json_data = request.get_json()
+    edit_id = json_data["id"]
+    cid = subscription_data[str(edit_id)]['cid']
+    subtype = json_data["subtype"]
+    substa = json_data["substa"]
+    nddate = json_data["nddate"]
+    sdate = json_data["sdate"]
+    binfo = json_data["binfo"]
+
+    new_name_entry = {
+        "sid": edit_id,
+        "cid": cid,
+        "subtype": subtype,
+        "substa": substa,
+        "nddate": nddate,
+        "sdate": sdate,
+        "binfo": binfo
+    }
+
+    subscription_data[str(edit_id)]=new_name_entry
+
+    # send back the WHOLE array of data, so the client can redisplay it
+    return jsonify(data=subscription_data, id_edit = str(edit_id))
+
 if __name__ == '__main__':
     app.run(debug=True)
-    #print(add_name())

@@ -2,6 +2,9 @@
 
 {% block content %}
 <div class="container">
+    <div style="text-align: center;">
+        {{cname}} 
+    </div>
     <div id="d3">
         <span class="bold">Subscription Type: </span> 
         <span id="s3">{{i.subtype}}</span>
@@ -34,8 +37,8 @@
     
     <br><br>
     <div>
-        <button id="final_submit2" class="btn btn-primary fixed" name="{{i.cid}}">Submit</button>
-        <button id="discard2" class="btn btn-primary fixed m2" name="{{i.cid}}" >Discard</button>
+        <button id="final_submit2" class="btn btn-primary fixed" name="{{i.sid}}">Submit</button>
+        <button id="discard2" class="btn btn-primary fixed m2" name="{{i.sid}}" >Discard</button>
     </div>
 </div>
 

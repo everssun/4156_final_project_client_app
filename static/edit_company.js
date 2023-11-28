@@ -2,9 +2,6 @@ $(document).ready(function(){
     var tempdata = {}
     var b1=false
     var b2=false
-    var b3=false
-    var b4=false
-    var b5=false
     $("#e1").click(function(){
         $("#d1").append('<br>')
         $("#d1").append('<input id="i1" type="text" placeholder="#NEW name"/>')
