@@ -91,6 +91,14 @@ def view_subscription(id=None):
     cname = company_data[cid]["cname"]
     return render_template('view_subs.html', i = i, name = cname)
 
+@app.route('/view_all_subs')
+def view_all(id=None):
+    global subscription_data
+    all_subs = []
+    for key in subscription_data:
+        all_subs.append(subscription_data[key])
+    return render_template('view_all_subs.html', all_subs = all_subs)
+
 @app.route('/edit_company/<id>')
 def edit_company(id=None):
     global company_data
