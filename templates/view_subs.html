@@ -1,36 +1,34 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="c2">
-    
-    <div class="big">
-        <p style="text-align: center;">{{name}}</p>
-        <!-- <span class="m">
-            <a href="/edit/{{i.id}}">
-                <button id="edit" class="btn btn-primary fixed">EDIT</button>
-            </a>
-        </span> -->
+
+    <div class="container">
+        <div class="big">
+            <p>{{name}}</p>
+        </div>
+        <a href="/edit_subscription/{{i.cid}}">
+            <button id="edit" class="btn btn-primary fixed m3">EDIT</button>
+        </a>
+
+        <div>
+            <span class="bold">Subscription Type:</span><br>{{i.subtype}}
+        </div><br>
+
+        <div>
+            <span class="bold">Subscription Status:</span><br>{{i.substa}}
+        </div><br>
+
+        <div>
+            <span class="bold">Next Due Date:</span><br>{{i.nddate}}
+        </div><br>
+
+        <div>
+            <span class="bold">Start Date:</span><br>{{i.sdate}}
+        </div><br>
+
+        <div>
+            <span class="bold">Billing Info:</span><br>{{i.binfo}}
+        </div><br>
     </div>
 
-    <div>
-        <span class="bold">Subscription Type:</span><br>{{i.subtype}}
-    </div><br>
-
-    <div>
-        <span class="bold">Subscription Status:</span><br>{{i.substa}}
-    </div><br>
-
-    <div>
-        <span class="bold">Next Due Date:</span><br>{{i.nddate}}
-    </div><br>
-
-    <div>
-        <span class="bold">Start Date:</span><br>{{i.sdate}}
-    </div><br>
-
-    <div>
-        <span class="bold">Billing Info:</span><br>{{i.binfo}}
-    </div><br>
-
-</div>
 {% endblock %}

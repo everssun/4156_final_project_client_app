@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <div id="d1">
+        <span class="bold">Company Name: </span> 
+        <span id="s1">{{i.cname}}</span>
+        <button id="e1" class="btn btn-primary fixed">edit</button>
+    </div>
+    <div id="d2">
+        <span class="bold">Company Email: </span> 
+        <span id="s2">{{i.email}}</span>
+        <button id="e2" class="btn btn-primary fixed">edit</button>
+    </div>
+    
+    <br><br>
+    <div>
+        <button id="final_submit1" class="btn btn-primary fixed" name="{{i.cid}}">Submit</button>
+        <button id="discard1" class="btn btn-primary fixed m2" name="{{i.cid}}" >Discard</button>
+    </div>
+</div>
+
+{% endblock %}

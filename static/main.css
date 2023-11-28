@@ -12,6 +12,7 @@
 .big1{font-weight: bolder; font-size: 24px;}
 .resize{width: 40%; height: 40%}
 .m{margin-left: 1020px;}
+.m3{margin-left: 460px; margin-top: -40px;}
 .m2{margin-left: 20px;}
 #c1{margin-right: 200px; display: inline-block;}
 #c2{display: inline-block;}
@@ -37,4 +38,33 @@
 }
 .navbar-custom {
     background-color: #1e2a78; 
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: auto;
+}
+.container .big p {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #444;
+}
+.container div {
+    margin-bottom: 15px;
+}
+.bold {
+    font-weight: bold;
 }
