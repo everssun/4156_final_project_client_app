@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    
+    <div>
+        <span class="bold">Company Name:</span><br>{{i.cname}}
+        
+        <a href="/edit_company/{{i.cid}}">
+            <button id="edit" class="btn btn-primary fixed m3">EDIT</button>
+        </a>
+        
+        
+    </div><br>
+
+    <div>
+        <span class="bold">Company Email:</span><br>{{i.email}}
+    </div><br>
+
+</div>
+{% endblock %}

@@ -8,11 +8,12 @@
     <link rel="icon" href="data:,">
 
     <!-- jquery -->
-    <script src="jquery-3.7.1.min.js"></script>
-    <!-- <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script> -->
-    <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'search.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename = 'search.js') }}"></script> -->
     <script type="text/javascript" src="{{ url_for('static', filename = 'add_data.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename = 'edit.js') }}"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename = 'edit_company.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'edit_subscription.js') }}"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <!-- Bootstrap CSS -->
@@ -24,6 +25,10 @@
 </head>
 
 <body>
+
+    <div class="navbar-nav">
+        <a class="nav-link" href="/admin-center">Back</a>
+    </div>
 
     <div class="container-fluid" style="padding-left: 0; padding-right: 0;" id="empty">
         {% block content %}

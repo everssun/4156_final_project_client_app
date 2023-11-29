@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+    <ul>
+        {% for info in all_subs%}
+        <span class="bold">Subcription {{info.sid}} </span> (click 
+        <a href="/edit_subscription/{{info.sid}}">
+            here
+        </a>
+        to edit):
+        <div class="bold">
+            Subscription Type:
+        </div>
+        <div style="text-align: center;">
+            {{info.subtype}}
+        </div>
+
+        <div class="bold">
+            Subscription Status:
+        </div>
+        <div style="text-align: center;">
+            {{info.substa}}
+        </div>
+
+        <div class="bold">
+            Next Due Date:
+        </div>
+        <div style="text-align: center;">
+            {{info.nddate}}
+        </div>
+
+        <div class="bold">
+            Start Date:
+        </div>
+        <div style="text-align: center;">
+            {{info.sdate}}
+        </div>
+
+        <div class="bold">
+            Billing Info:
+        </div>
+        <div style="text-align: center;">
+            {{info.binfo}}
+        </div>
+
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
