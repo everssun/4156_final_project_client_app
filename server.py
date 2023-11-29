@@ -238,5 +238,49 @@ def save_edit_subs():
     # send back the WHOLE array of data, so the client can redisplay it
     return jsonify(data=subscription_data, id_edit = str(edit_id))
 
+@app.route('/member-signup', methods=['GET','POST'])
+def member_signup():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        password = request.form.get('password')
+        phone = request.form.get('phone')
+
+        # print(f"Email: {email}, First Name: {first_name}, Last Name: {last_name}, Password: {password}, Phone: {phone}")
+        # TODO: Add some sql injection attack protection (also protect on service side)
+        
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json',
+        }
+
+        request_body = {
+            "first_name" : first_name,
+            "last_name" : last_name,
+            "email" : email,
+            "password": password,
+            "phone_number" : phone
+        }
+
+        try:
+            # Make a GET request to the external API
+            response = requests.post(service_url+"/member/addMember", json=request_body, headers=headers)
+            api_data = response.content
+            print(api_data)
+            
+            if response.status_code == 200:
+                return render_template('member_center.html', first_name=first_name )
+            else:
+                # If the request was not successful, return an error message
+                return api_data
+
+        except Exception as e:
+            # Handle any exceptions that may occur during the request
+            return jsonify({'error': str(e)})
+            
+            
+    return render_template('member_signup.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
