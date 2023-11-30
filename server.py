@@ -10,6 +10,7 @@ app.secret_key = 'debugTeam'
 
 company_id = 1
 subscription_id = 1
+cookies = ""
 
 company_data = {
 	"1":{
@@ -87,7 +88,7 @@ def test_session():
         return jsonify({'error': str(e)})
 
 @app.route('/')
-def hello_world():
+def welcome():
     return render_template('welcome.html')
 
 @app.route('/admin-login', methods=['GET', 'POST'])
@@ -293,10 +294,12 @@ def member_signup():
             print(api_data)
             
             if response.status_code == 200:
-                return render_template('member_login.html' )
+                return redirect(url_for('member_login'))
             else:
                 # If the request was not successful, return an error message
-                return api_data
+                print(f"member sign up error:{api_data}")
+                flash('Your email has been registered before, please login here', 'warning')
+                return redirect(url_for('member_login')) 
 
         except Exception as e:
             # Handle any exceptions that may occur during the request
@@ -332,9 +335,12 @@ def member_login():
             
             if response.status_code == 200:
                 # set_cookie_header = response.headers.get('Set-Cookie')
-                cookies = response.cookies
-                print(cookies)
-                return render_template('member_center.html')
+                cookies_list = [{'name': cookie.name, 'value': cookie.value} for cookie in response.cookies]
+                
+                # Store the cookies in the Flask session
+                session['cookies'] = cookies_list
+                print(session['cookies'])
+                return redirect(url_for('member_center'))
             elif response.status_code == 401:
                 flash('Invalid email or password. Please try again.', 'primary')
             else:
@@ -346,6 +352,35 @@ def member_login():
             return jsonify({'error': str(e)})
        
     return render_template('member_login.html')
+
+@app.route('/member-center', methods=['GET','POST'])
+def member_center():
+    cookies_list = session.get('cookies')
+
+    if not cookies_list:
+        flash('Please log in to access the member center.', 'warning')
+        return redirect(url_for('member_login')) 
+    
+    # Reconstruct the RequestsCookieJar from the list of dictionaries
+    cookies = {cookie['name']: cookie['value'] for cookie in cookies_list}
+    print(cookies)
+
+    headers = {
+        'Authorization': f'Bearer {jwt_token}'
+    }
+    response = requests.get(service_url+"/member/profile", headers=headers, cookies=cookies)
+    print(response.json())
+    if response.status_code == 200:
+        return render_template('member_center.html', json_profile=response.json())
+    
+    flash('Your session expired, please login again.', 'warning')
+    return redirect(url_for('member_login')) 
+
+@app.route('/logout')
+def logout():
+    # Clear session cookies
+    session.clear()
+    return redirect(url_for('welcome'))
 
 if __name__ == '__main__':
     app.run(debug=True)
