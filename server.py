@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, redirect, url_for, session
+from flask import render_template, redirect, url_for, session, flash
 from flask import Response, request, jsonify
 import requests
 
@@ -62,6 +62,29 @@ def test():
         # Handle any exceptions that may occur during the request
         return jsonify({'error': str(e)})
 
+@app.route('/test-session')
+def test_session():
+    headers = {
+        'Authorization': f'Bearer {jwt_token}',
+        'Content-Type': 'application/json',
+    }
+
+    try:
+        # Make a GET request to the external API
+        response = requests.get(service_url, headers=headers)
+
+        # Check if the request was successful (HTTP status code 200)
+        if response.status_code == 200:
+            # Parse and return the API response
+            api_data = response.content
+            return api_data
+        else:
+            # If the request was not successful, return an error message
+            return jsonify({'error': f'Request failed with status code {response.status_code}'})
+
+    except Exception as e:
+        # Handle any exceptions that may occur during the request
+        return jsonify({'error': str(e)})
 
 @app.route('/')
 def hello_world():
@@ -270,7 +293,7 @@ def member_signup():
             print(api_data)
             
             if response.status_code == 200:
-                return render_template('member_center.html', first_name=first_name )
+                return render_template('member_login.html' )
             else:
                 # If the request was not successful, return an error message
                 return api_data
@@ -281,6 +304,48 @@ def member_signup():
             
             
     return render_template('member_signup.html')
+
+
+@app.route('/member-login', methods=['GET','POST'])
+def member_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # TODO: Add some sql injection attack protection (also protect on service side)
+        
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json',
+        }
+
+        request_body = {
+            "email" : email,
+            "password": password
+        }
+
+        try:
+            # Make a GET request to the external API
+            response = requests.post(service_url+"/member/login", json=request_body, headers=headers)
+            api_data = response.content
+            print(api_data)
+            
+            if response.status_code == 200:
+                # set_cookie_header = response.headers.get('Set-Cookie')
+                cookies = response.cookies
+                print(cookies)
+                return render_template('member_center.html')
+            elif response.status_code == 401:
+                flash('Invalid email or password. Please try again.', 'primary')
+            else:
+                # If the request was not successful, return an error message
+                return api_data
+
+        except Exception as e:
+            # Handle any exceptions that may occur during the request
+            return jsonify({'error': str(e)})
+       
+    return render_template('member_login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
