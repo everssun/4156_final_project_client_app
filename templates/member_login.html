@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} mt-3">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+{% endwith %}
+
+<div class="container login-container">
+    <form method="post" action="{{ url_for('member_login') }}">
+        <h2 class="text-center">Member Login</h2>
+        <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input type="text" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    </form>
+</div>
+{% endblock %}
