@@ -143,9 +143,6 @@ def add_subs():
         start_date = request.form.get('start_date')
         bill_info = request.form.get('bill_info')
 
-        # print(f"Email: {email}, First Name: {first_name}, Last Name: {last_name}, Password: {password}, Phone: {phone}")
-        # TODO: Add some sql injection attack protection (also protect on service side)
-        
         headers = {
             'Authorization': f'Bearer {jwt_token}',
             'Content-Type': 'application/json',
@@ -181,6 +178,45 @@ def add_subs():
             
             
     return render_template('add_subs.html')
+
+@app.route('/update_subs', methods=['GET','POST'])
+def update_subs():
+    if request.method == 'POST':
+        mem_email = request.form.get('mem_email')
+        subs_name = request.form.get('subs_name')
+        new_act = request.form.get('new_act')
+        
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json',
+        }
+
+        request_body = {
+            "email" : mem_email,
+            "subscription_name" : subs_name,
+            "new_action" : new_act
+        }
+
+        try:
+            # Make a GET request to the external API
+            response = requests.patch(service_url+"/subscription/updateSubscription", json=request_body, headers=headers)
+            api_data = response.content
+            print(api_data)
+            
+            if response.status_code == 200:
+                return redirect(url_for('admin_center'))
+            else:
+                # If the request was not successful, return an error message
+                print(f"subscription update error:{api_data}")
+                flash('This subscription is not found, please check the email and subscription name', 'warning')
+                return redirect(url_for('update_subs')) 
+
+        except Exception as e:
+            # Handle any exceptions that may occur during the request
+            return jsonify({'error': str(e)})
+            
+            
+    return render_template('update_subs.html')
 
 @app.route('/view_company/<id>')
 def view_company(id=None):

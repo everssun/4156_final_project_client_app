@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="navbar-nav">
+    <a class="nav-link" href="/admin-center">Back</a>
+</div>
+
+<div class="container">
+    <form method="post" action="{{ url_for('update_subs') }}">
+        <h2 class="text-center">Enter the NEW subscription's Info:</h2>
+
+        <div class="mb-3">
+            <label for="mem_email" class="form-label">Member Email:</label>
+            <input type="text" class="form-control" id="mem_email" name="mem_email" placeholder="member email" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="subs_name" class="form-label">Subscription Name:</label>
+            <input type="text" class="form-control" id="subs_name" name="subs_name" placeholder="subscription name" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="new_act" class="form-label">New Action:</label>
+            <input type="text" class="form-control" id="new_act" name="new_act" placeholder="new action" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+    </form>
+</div>
+{% endblock %}
