@@ -33,11 +33,13 @@ subscription_data = {
 }
 
 # localhost
-service_url = "http://0.0.0.0:3000"
+service_url = "http://localhost:3000"
 # JWT token
 jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzI1NzM1NjEsImlzcyI6IlN1Yk1hbmFnZXIiLCJzdWIiOiIyMSJ9.gPSQ91ze5GL4CkCE_sRWyPoQRRcEuQsogoQEJ9cxeQs"
 
 # ROUTES
+
+# 快过期email
 
 @app.route('/test')
 def test():
@@ -125,10 +127,60 @@ def add_company():
     global company_data
     return render_template('add_company.html', d=company_data)
 
-@app.route('/add_susbscription')
+@app.route('/add_subscription')
 def add_susbcription():
     global subscription_data
     return render_template('add_subscription.html', d=subscription_data)
+
+@app.route('/add_subs', methods=['GET','POST'])
+def add_subs():
+    if request.method == 'POST':
+        mem_email = request.form.get('mem_email')
+        subs_name = request.form.get('subs_name')
+        subs_type = request.form.get('subs_type')
+        subs_sta = request.form.get('subs_sta')
+        next_date = request.form.get('next_date')
+        start_date = request.form.get('start_date')
+        bill_info = request.form.get('bill_info')
+
+        # print(f"Email: {email}, First Name: {first_name}, Last Name: {last_name}, Password: {password}, Phone: {phone}")
+        # TODO: Add some sql injection attack protection (also protect on service side)
+        
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json',
+        }
+
+        request_body = {
+            "member_email" : mem_email,
+            "subscription_name" : subs_name,
+            "subscription_type" : subs_type,
+            "subscription_status": subs_sta,
+            "next_due_date" : next_date,
+            "start_date": start_date,
+            "billing_info": bill_info
+        }
+
+        try:
+            # Make a GET request to the external API
+            response = requests.post(service_url+"/subscription/addSubscription", json=request_body, headers=headers)
+            api_data = response.content
+            print(api_data)
+            
+            if response.status_code == 200:
+                return redirect(url_for('add_subs'))
+            else:
+                # If the request was not successful, return an error message
+                print(f"subscription add error:{api_data}")
+                flash('This subscription has been added before, please add another one', 'warning')
+                return redirect(url_for('add_subs')) 
+
+        except Exception as e:
+            # Handle any exceptions that may occur during the request
+            return jsonify({'error': str(e)})
+            
+            
+    return render_template('add_subs.html')
 
 @app.route('/view_company/<id>')
 def view_company(id=None):

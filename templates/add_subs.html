@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="navbar-nav">
+    <a class="nav-link" href="/admin-center">Back</a>
+</div>
+
+<div class="container">
+    <form method="post" action="{{ url_for('add_subs') }}">
+        <div class="col-md-12" id="success"></div>
+
+        <!-- <div class="col-md-12 big1">Enter the subscription's Info:</div> -->
+        <h2 class="text-center">Enter the subscription's Info:</h2>
+
+        <div class="mb-3">
+            <label for="mem_email" class="form-label">Member Email:</label>
+            <input type="text" class="form-control" id="mem_email" name="mem_email" placeholder="member email" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="subs_name" class="form-label">Subscription Name:</label>
+            <input type="text" class="form-control" id="subs_name" name="subs_name" placeholder="subscription name" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="subs_type" class="form-label">Subscription Type:</label>
+            <input type="text" class="form-control" id="subs_type" name="subs_type" placeholder="subscription type" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="subs_sta" class="form-label">Subscription Status:</label>
+            <input type="text" class="form-control" id="subs_sta" name="subs_sta" placeholder="subscription status" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="next_date" class="form-label">Next Due Date:</label>
+            <input type="text" class="form-control" id="next_date" name="next_date" placeholder="next due date" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Start Date:</label>
+            <input type="text" class="form-control" id="start_date" name="start_date" placeholder="start date" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="bill_info" class="form-label">Billing Info:</label>
+            <input type="text" class="form-control" id="bill_info" name="bill_info" placeholder="billing info" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+    </form>
+</div>
+{% endblock %}
