@@ -159,17 +159,18 @@ def add_subs():
         }
 
         try:
-            # Make a GET request to the external API
+            # Make a POST request to the external API
             response = requests.post(service_url+"/subscription/addSubscription", json=request_body, headers=headers)
             api_data = response.content
             print(api_data)
             
             if response.status_code == 200:
+                flash("Add subscription successfullly!", "primary")
                 return redirect(url_for('add_subs'))
             else:
                 # If the request was not successful, return an error message
                 print(f"subscription add error:{api_data}")
-                flash('This subscription has been added before, please add another one', 'warning')
+                flash(f'Error: {api_data}', 'warning')
                 return redirect(url_for('add_subs')) 
 
         except Exception as e:

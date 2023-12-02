@@ -1,6 +1,17 @@
 {% extends "layout.html" %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} mt-3">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+{% endwith %}
+
 <div class="navbar-nav">
     <a class="nav-link" href="/admin-center">Back</a>
 </div>
@@ -26,26 +37,34 @@
 
         <div class="mb-3">
             <label for="subs_type" class="form-label">Subscription Type:</label>
-            <input type="text" class="form-control" id="subs_type" name="subs_type" placeholder="subscription type" required>
+            <select class="form-control" id="subs_type" name="subs_type" required>
+                <option value="general">General</option>
+                <option value="plus">Plus</option>
+                <option value="pro">Pro</option>
+            </select>
         </div>
         <div class="col-md-12 upb"></div>
 
         <div class="mb-3">
             <label for="subs_sta" class="form-label">Subscription Status:</label>
-            <input type="text" class="form-control" id="subs_sta" name="subs_sta" placeholder="subscription status" required>
+            <select class="form-control" id="subs_sta" name="subs_sta" required>
+                <option value="activated">Activated</option>
+                <option value="canceled">Canceled</option>
+                <option value="suspended">Suspended</option>
+            </select>
         </div>
         <div class="col-md-12 upb"></div>
-
-        <div class="mb-3">
-            <label for="next_date" class="form-label">Next Due Date:</label>
-            <input type="text" class="form-control" id="next_date" name="next_date" placeholder="next due date" required>
-        </div>
-        <div class="col-md-12 upb"></div>
-
         <div class="mb-3">
             <label for="start_date" class="form-label">Start Date:</label>
-            <input type="text" class="form-control" id="start_date" name="start_date" placeholder="start date" required>
+            <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
         </div>
+        
+        <div class="col-md-12 upb"></div>
+        <div class="mb-3">
+            <label for="next_date" class="form-label">Next Due Date:</label>
+            <input type="datetime-local" class="form-control" id="next_date" name="next_date" required>
+        </div>
+       
         <div class="col-md-12 upb"></div>
 
         <div class="mb-3">
