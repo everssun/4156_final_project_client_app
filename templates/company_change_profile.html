@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="navbar-nav">
+    <a class="nav-link" href="/admin-center">Back</a>
+</div>
+
+<div class="container">
+    <form method="post" action="{{ url_for('company_change_profile') }}">
+        <h2 class="text-center">Change Company's Profile:</h2>
+
+        <div class="mb-3">
+            <label for="newname" class="form-label">New Company Name:</label>
+            <input type="text" class="form-control" id="newname" name="newname" placeholder="new company name" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+        <div>
+            <p class="fst-italic text-secondary"> To change other information, please contact the service provider directly.</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+    </form>
+</div>
+{% endblock %}

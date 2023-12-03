@@ -115,7 +115,46 @@ def admin_login():
 def admin_center():
     if not session.get('authenticated'):
         return redirect(url_for('admin_login'))
-    return render_template('admin_center.html')
+    
+    headers = {
+        'Authorization': f'Bearer {jwt_token}'
+    }
+    response = requests.get(service_url+"/company", headers=headers)
+    print(response.json())
+   
+    return render_template('admin_center.html', json_profile=response.json())
+
+@app.route('/company-change-profile', methods=['GET', 'POST'])
+def company_change_profile():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    if request.method == 'POST':
+        newCompanyName = request.form['newname']
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type' : 'application/json'
+        }
+        
+        request_body = {
+           "company_name" : newCompanyName
+        }
+        try:
+            response = requests.patch(service_url+"/company/changeCompany", headers=headers, json=request_body)
+            api_data = response.content
+            if response.status_code == 200:
+                    flash("Update company's profile successfullly!", "primary")
+                    return redirect(url_for('admin_center'))
+            else:
+                    # If the request was not successful, return an error message
+                    print(f"Update profile error:{api_data}")
+                    flash(f'Update profile error:{api_data}, please try again or cantact the service provider.', 'warning')
+                    return redirect(url_for('admin_center')) 
+        except Exception as e:
+                    # Handle any exceptions that may occur during the request
+                    return jsonify({'error': str(e)})
+
+    return render_template('company_change_profile.html')
 
 @app.route('/admin-logout')
 def admin_logout():
