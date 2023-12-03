@@ -1,3 +1,4 @@
+import json
 from flask import Flask
 from flask import render_template, redirect, url_for, session, flash
 from flask import Response, request, jsonify
@@ -155,6 +156,32 @@ def company_change_profile():
                     return jsonify({'error': str(e)})
 
     return render_template('company_change_profile.html')
+
+@app.route('/admin-manage-members')
+def admin_manage_members():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    headers = {
+        'Authorization': f'Bearer {jwt_token}',
+        'Content-Type' : 'application/json'
+    }
+
+    page = request.args.get('page', 1, type=int)
+    page_size = 10  
+    
+    # Send request to service with page and page size parameters
+    pagination_url = f"{service_url}/company/getMembers?page={page}&pagesize={page_size}"
+    response = requests.get(pagination_url, headers=headers)
+
+
+    paginated_data = response.json()
+    members_data = paginated_data.get("members")
+    total_members = int(paginated_data.get("total_members"))
+    total_pages = int(paginated_data.get("total_pages"))
+
+    return render_template('admin_manage_members.html', data=members_data, total_members=total_members, page=page, page_size=page_size, total_pages=total_pages)
 
 @app.route('/admin-logout')
 def admin_logout():

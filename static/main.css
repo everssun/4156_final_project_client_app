@@ -68,3 +68,7 @@ body {
 .bold {
     font-weight: bold;
 }
+
+.full-width{
+    max-width: 100%;
+}
