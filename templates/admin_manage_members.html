@@ -44,7 +44,7 @@
                     <td><a class="btn btn-light" href="{{url_for('admin_view_member', email=item['email'])}}"><i class="fa fa-search"></i></a></td>
                     <!-- use a model to allow modification -->
                     <td><button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modifyModal{{ loop.index }}"><i class="fas fa-edit"></i></button></td> 
-                    <td><a class="btn btn-danger"><i class="fas fa-trash-alt"></i></a></td>
+                    <td><a class="btn btn-danger" onclick="confirmDelete('{{url_for('admin_delete_member')}}','{{item['email']}}')"><i class="fas fa-trash-alt"></i></a></td>
                 </tr>
 
                  <!-- Modal for each row -->

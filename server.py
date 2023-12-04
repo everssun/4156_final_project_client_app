@@ -242,7 +242,6 @@ def admin_change_member_info():
             "email": email,
             "phone_number": phone_number
         }
-        print(request_body)
 
         try:
             response = requests.patch(service_url+"/admin/member/changeMemberInfo", headers=headers, json=request_body)
@@ -258,6 +257,34 @@ def admin_change_member_info():
         except Exception as e:
                         # Handle any exceptions that may occur during the request
                         return jsonify({'error': str(e)})
+    return redirect(url_for('admin_manage_members'))  
+
+@app.route('/admin-delete-member',  methods=['GET', 'POST'])
+def admin_delete_member():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+
+    headers = {
+        'Authorization': f'Bearer {jwt_token}'
+    }
+    if request.method == 'POST':
+        email = request.form['email']
+        print(email)
+        try:
+            response = requests.delete(service_url+"/admin/member/removeMember/"+email, headers=headers)
+            api_data = response.content
+
+            if response.status_code == 204:
+                return redirect(url_for('admin_manage_members')) 
+            else:
+                # If the request was not successful, return an error message
+                print(f"Delete member error:{api_data}")
+                flash(f'Delete member error:{api_data}, please try again or cantact the service provider.', 'warning')
+                return redirect(url_for('admin_manage_members')) 
+        except Exception as e:
+                # Handle any exceptions that may occur during the request
+                return jsonify({'error': str(e)})
     return redirect(url_for('admin_manage_members'))  
 
 @app.route('/admin-logout')
