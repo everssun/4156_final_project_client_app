@@ -1,3 +1,4 @@
+<script src="../static/manage_members.js"></script>
 {% extends "layout.html" %}
 
 {% block content %}
@@ -11,6 +12,7 @@
                 {% endfor %}
             {% endif %}
 {% endwith %}
+
 <div class="navbar-nav">
     <a class="nav-link" href="/admin-center">Back</a>
 </div>
@@ -38,33 +40,75 @@
                     <td>{{ item['email'] }}</td>
                     <td>{{ item['first_name'] }}</td>
                     <td>{{ item['last_name'] }}</td>
-                    <td>{{item['phone_number']}}</td>
-                    <td><a class="btn btn-light"><i class="fa fa-search"></i></a></td>
-                    <td><a class="btn btn-light"><i class="fas fa-edit"></i></a></td>
+                    <td>{{ item['phone_number']}}</td>
+                    <td><a class="btn btn-light" href="{{url_for('admin_view_member', email=item['email'])}}"><i class="fa fa-search"></i></a></td>
+                    <!-- use a model to allow modification -->
+                    <td><button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modifyModal{{ loop.index }}"><i class="fas fa-edit"></i></button></td> 
                     <td><a class="btn btn-danger"><i class="fas fa-trash-alt"></i></a></td>
                 </tr>
+
+                 <!-- Modal for each row -->
+                    <div class="modal fade" id="modifyModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modifyModalLabel">Modify Member's Information</h5>
+                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Modify form with input fields -->
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="modifiedFirstName{{ loop.index }}">First Name:</label>
+                                            <input type="text" class="form-control" id="modifiedFirstName{{ loop.index }}" value="{{ item['first_name'] }}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="modifiedLastName{{ loop.index }}">Last Name:</label>
+                                            <input type="text" class="form-control" id="modifiedLastName{{ loop.index }}" value="{{ item['last_name'] }}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="modifiedPhoneNumber{{ loop.index }}">Phone Number:</label>
+                                            <input type="text" class="form-control" id="modifiedPhoneNumber{{ loop.index }}" value="{{ item['phone_number'] }}">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="modifySaveChanges('{{url_for('admin_change_member_info')}}', '{{ item['email'] }}','{{ loop.index }}')">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             {% endfor %}
         </tbody>
     </table>
+
+
     
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                <a class="page-link" href="?page={{ page - 1 }}&pagesize={{ page_size }}" tabindex="-1" {% if page == 1 %}aria-disabled="true"{% endif %}>Previous</a>
-            </li>
-            
-            {% for p in range(1, total_pages + 1) %}
-                <li class="page-item {% if p == page %}active{% endif %}">
-                    <a class="page-link" href="?page={{ p }}&pagesize={{ page_size }}">{{ p }}</a>
+    <div class="text-center d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ page - 1 }}&pagesize={{ page_size }}" tabindex="-1" {% if page == 1 %}aria-disabled="true"{% endif %}>Previous</a>
                 </li>
-            {% endfor %}
-            
-            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                <a class="page-link" href="?page={{ page + 1 }}&pagesize={{ page_size }}">Next</a>
-            </li>
-        </ul>
-    </nav>
+                
+                {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ p }}&pagesize={{ page_size }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+                
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ page + 1 }}&pagesize={{ page_size }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
+
+
 
 
 {% endblock %}

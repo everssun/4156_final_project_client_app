@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+{% endwith %}
+
+<div class="navbar-nav">
+    <a class="nav-link" href="{{url_for('admin_manage_members')}}">Back</a>
+</div>
+
+<div class="container full-width my-5 py-6">
+    <h2 class="mb-3">Member's Profile</h2>
+    {% if json_profile %}
+        <p><strong>Email:</strong> {{ json_profile.email }}</p>
+        <p><strong>First Name:</strong> {{ json_profile.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ json_profile.last_name }}</p>
+        <p><strong>Phone Number:</strong> {{ json_profile.phone_number }}</p>
+    {% else %}
+        <p>Something Wrong. Can not load your profile. Please contact the admin.</p>
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

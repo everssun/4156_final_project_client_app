@@ -173,15 +173,92 @@ def admin_manage_members():
     
     # Send request to service with page and page size parameters
     pagination_url = f"{service_url}/company/getMembers?page={page}&pagesize={page_size}"
-    response = requests.get(pagination_url, headers=headers)
+    
+    try:
+        response = requests.get(pagination_url, headers=headers)
+        api_data = response.content
+        
+        if response.status_code == 200:
+            paginated_data = response.json()
+            members_data = paginated_data.get("members")
+            total_members = int(paginated_data.get("total_members"))
+            total_pages = int(paginated_data.get("total_pages"))
+            return render_template('admin_manage_members.html', data=members_data, total_members=total_members, page=page, page_size=page_size, total_pages=total_pages)
+        else:
+                # If the request was not successful, return an error message
+                print(f"Update profile error:{api_data}")
+                flash(f'Update profile error:{api_data}, please try again or cantact the service provider.', 'warning')
+                return redirect(url_for('admin_center')) 
+    except Exception as e:
+                    # Handle any exceptions that may occur during the request
+                    return jsonify({'error': str(e)})
 
+@app.route('/admin-view-member/<email>')
+def admin_view_member(email):
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    headers = {
+        'Authorization': f'Bearer {jwt_token}',
+        'Content-Type' : 'application/json'
+    }
 
-    paginated_data = response.json()
-    members_data = paginated_data.get("members")
-    total_members = int(paginated_data.get("total_members"))
-    total_pages = int(paginated_data.get("total_pages"))
+    try:
+        response = requests.get(service_url+"/admin/member/profile/"+email, headers=headers)
+        api_data = response.content
 
-    return render_template('admin_manage_members.html', data=members_data, total_members=total_members, page=page, page_size=page_size, total_pages=total_pages)
+        if response.status_code == 200:
+            return render_template('member_profile.html', json_profile=response.json())
+        else:
+            # If the request was not successful, return an error message
+            print(f"Update profile error:{api_data}")
+            flash(f'Update profile error:{api_data}, please try again or cantact the service provider.', 'warning')
+            return redirect(url_for('admin_manage_members')) 
+    except Exception as e:
+                    # Handle any exceptions that may occur during the request
+                    return jsonify({'error': str(e)})
+
+@app.route('/admin-change-member-info', methods=['GET', 'POST'])
+def admin_change_member_info():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        phone_number = request.form['phone_number']
+
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type' : 'application/json'
+        }
+        
+        request_body = {
+            "first_name" : first_name,
+            "last_name": last_name,
+            "email": email,
+            "phone_number": phone_number
+        }
+        print(request_body)
+
+        try:
+            response = requests.patch(service_url+"/admin/member/changeMemberInfo", headers=headers, json=request_body)
+            api_data = response.content
+
+            if response.status_code == 200:
+                return redirect(url_for('admin_manage_members')) 
+            else:
+                # If the request was not successful, return an error message
+                print(f"Update profile error:{api_data}")
+                flash(f'Update profile error:{api_data}, please try again or cantact the service provider.', 'warning')
+                return redirect(url_for('admin_manage_members')) 
+        except Exception as e:
+                        # Handle any exceptions that may occur during the request
+                        return jsonify({'error': str(e)})
+    return redirect(url_for('admin_manage_members'))  
 
 @app.route('/admin-logout')
 def admin_logout():
