@@ -204,16 +204,26 @@ def admin_view_member(email):
         'Content-Type' : 'application/json'
     }
 
-    try:
-        response = requests.get(service_url+"/admin/member/profile/"+email, headers=headers)
-        api_data = response.content
+    request_body = {
+        "email" : email
+    }
 
-        if response.status_code == 200:
-            return render_template('member_profile.html', json_profile=response.json())
+    try:
+        profile_response = requests.get(service_url+"/admin/member/profile/"+email, headers=headers)
+        profile_api_data = profile_response.content
+
+        subscriptions_response = requests.get(service_url+"/admin/subscription/viewSubscriptions", headers=headers, json=request_body)
+        subscription_api_data = subscriptions_response.content
+
+        if profile_response.status_code and subscriptions_response.status_code == 200:
+            subscriptions_json = subscriptions_response.json()
+            subscriptions_data = subscriptions_json.get("subscriptions")
+            total_subscriptions = int(subscriptions_json.get("total_subscriptions"))
+            return render_template('member_profile.html', json_profile=profile_response.json(), subscriptions_data=subscriptions_data, total_subscriptions=total_subscriptions)
         else:
             # If the request was not successful, return an error message
-            print(f"Update profile error:{api_data}")
-            flash(f'Update profile error:{api_data}, please try again or cantact the service provider.', 'warning')
+            print(f"View member's profile error:{profile_api_data} or {subscription_api_data}")
+            flash(f'View member\'s profile error:{profile_api_data} or {subscription_api_data}, please try again or cantact the service provider.', 'warning')
             return redirect(url_for('admin_manage_members')) 
     except Exception as e:
                     # Handle any exceptions that may occur during the request

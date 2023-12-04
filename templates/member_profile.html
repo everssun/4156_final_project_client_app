@@ -29,5 +29,43 @@
 
 </div>
 
+<div class="container full-width my-5 py-6">
+    <h3 class="mb-3">Member's Subscriptions:</h3>
+    <p><strong>Totoal Subscriptions Count:</strong> {{total_subscriptions}}</p>
+    <div class="container full-width mt-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subscription ID</th>
+                    <th>Subscription Name</th>
+                    <th>Subscription Status</th>
+                    <th>Subscription Type</th>
+                    <th>Start Date</th>
+                    <th>Next Due Date</th>
+                    <th>Billing Info</th>
+                    <th>Last Action</th>
+                    <th>Last Action Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in subscriptions_data%}
+                <tr>
+                    <td>{{item['subscription_id']}}</td>
+                    <td>{{item['subscription_name']}}</td>
+                    <td>{{item['subscription_status']}}</td>
+                    <td>{{item['subscription_type']}}</td>
+                    <td>{{item['start_date']}}</td>
+                    <td>{{item['next_due_date']}}</td>
+                    <td>{{item['billing_info']}}</td>
+                    <td>{{item['last_action']}}</td>
+                    <td>{{item['last_action_date']}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+
+
+</div>
+
 
 {% endblock %}

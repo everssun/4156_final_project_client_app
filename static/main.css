@@ -71,4 +71,5 @@ body {
 
 .full-width{
     max-width: 100%;
+    overflow-x: auto;
 }
