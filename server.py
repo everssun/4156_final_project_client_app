@@ -13,25 +13,25 @@ company_id = 1
 subscription_id = 1
 cookies = ""
 
-company_data = {
-	"1":{
-		"cid": "1",
-		"cname": "CompanyA",
-		"email": "1@gmail.com"
-        }
-}
+# company_data = {
+# 	"1":{
+# 		"cid": "1",
+# 		"cname": "CompanyA",
+# 		"email": "1@gmail.com"
+#         }
+# }
 
-subscription_data = {
-	"1":{
-        "sid": "1",
-		"cid": "1",
-		"subtype": "Free",
-		"substa": "active",
-		"nddate": "2023-10-29 00:00:00",
-		"sdate": "2023-9-29 00:00:00",
-		"binfo": "sth"
-        }
-}
+# subscription_data = {
+# 	"1":{
+#         "sid": "1",
+# 		"cid": "1",
+# 		"subtype": "Free",
+# 		"substa": "active",
+# 		"nddate": "2023-10-29 00:00:00",
+# 		"sdate": "2023-9-29 00:00:00",
+# 		"binfo": "sth"
+#         }
+# }
 
 # localhost
 service_url = "http://localhost:3000"
@@ -39,9 +39,6 @@ service_url = "http://localhost:3000"
 jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzI1NzM1NjEsImlzcyI6IlN1Yk1hbmFnZXIiLCJzdWIiOiIyMSJ9.gPSQ91ze5GL4CkCE_sRWyPoQRRcEuQsogoQEJ9cxeQs"
 
 # ROUTES
-
-# 快过期email
-
 @app.route('/test')
 def test():
     headers = {
@@ -297,23 +294,75 @@ def admin_delete_member():
                 return jsonify({'error': str(e)})
     return redirect(url_for('admin_manage_members'))  
 
+
+@app.route('/admin-change-member-sub', methods=['GET', 'POST'])
+def admin_change_member_sub():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        subscription_name = request.form['subscription_name']
+        subscription_status = request.form['subscription_status']
+        subscription_type = request.form['subscription_type']
+        start_date = request.form['start_date']
+        next_due_date = request.form['next_due_date']
+        billing_info = request.form['billing_info']
+        subscription_id = request.form['subscription_id']
+        email = request.form['email']
+
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type' : 'application/json'
+        }
+        
+        request_body = {
+            "subscription_id" : subscription_id,
+            "subscription_name" : subscription_name,
+            "subscription_status": subscription_status,
+            "subscription_type": subscription_type,
+            "start_date": start_date,
+            "next_due_date": next_due_date,
+            "billing_info": billing_info
+        }
+
+        try:
+            response = requests.patch(service_url+"/admin/subscription/updateSubscription", headers=headers, json=request_body)
+            api_data = response.content
+
+            if response.status_code == 200:
+                return redirect(url_for('admin_view_member', email=email)) 
+            else:
+                # If the request was not successful, return an error message
+                print(f"Update Member's Subscription error:{api_data}")
+                flash(f'Update Member\'s Subscription error:{api_data}, please try again or cantact the service provider.', 'warning')
+                return redirect(url_for('admin_view_member', email=email)) 
+        except Exception as e:
+                        # Handle any exceptions that may occur during the request
+                        return jsonify({'error': str(e)})
+    return redirect(url_for('admin_view_member', email=email))  
+
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('authenticated', None)
     return redirect(url_for('admin_login'))
     
-@app.route('/add_company')
-def add_company():
-    global company_data
-    return render_template('add_company.html', d=company_data)
+# @app.route('/add_company')
+# def add_company():
+#     global company_data
+#     return render_template('add_company.html', d=company_data)
 
-@app.route('/add_subscription')
-def add_susbcription():
-    global subscription_data
-    return render_template('add_subscription.html', d=subscription_data)
+# @app.route('/add_subscription')
+# def add_susbcription():
+#     global subscription_data
+#     return render_template('add_subscription.html', d=subscription_data)
 
 @app.route('/add_subs', methods=['GET','POST'])
 def add_subs():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
     if request.method == 'POST':
         mem_email = request.form.get('mem_email')
         subs_name = request.form.get('subs_name')
@@ -322,6 +371,8 @@ def add_subs():
         next_date = request.form.get('next_date')
         start_date = request.form.get('start_date')
         bill_info = request.form.get('bill_info')
+
+        from_admin = request.form.get('change_from_admin')
 
         headers = {
             'Authorization': f'Bearer {jwt_token}',
@@ -345,6 +396,8 @@ def add_subs():
             print(api_data)
             
             if response.status_code == 200:
+                if from_admin is not None:
+                    return redirect(url_for('admin_view_member', email=mem_email)) 
                 flash("Add subscription successfullly!", "primary")
                 return redirect(url_for('add_subs'))
             else:
@@ -362,6 +415,10 @@ def add_subs():
 
 @app.route('/update_subs', methods=['GET','POST'])
 def update_subs():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
     if request.method == 'POST':
         mem_email = request.form.get('mem_email')
         subs_name = request.form.get('subs_name')
@@ -399,20 +456,20 @@ def update_subs():
             
     return render_template('update_subs.html')
 
-@app.route('/view_company/<id>')
-def view_company(id=None):
-    global company_data
-    i = company_data[id]
-    return render_template('view_company.html', i = i)
+# @app.route('/view_company/<id>')
+# def view_company(id=None):
+#     global company_data
+#     i = company_data[id]
+#     return render_template('view_company.html', i = i)
 
-@app.route('/view_subs/<id>')
-def view_subscription(id=None):
-    global subscription_data
-    global company_data
-    i = subscription_data[id]
-    cid = subscription_data[id]["cid"]
-    cname = company_data[cid]["cname"]
-    return render_template('view_subs.html', i = i, name = cname)
+# @app.route('/view_subs/<id>')
+# def view_subscription(id=None):
+#     global subscription_data
+#     global company_data
+#     i = subscription_data[id]
+#     cid = subscription_data[id]["cid"]
+#     cname = company_data[cid]["cname"]
+#     return render_template('view_subs.html', i = i, name = cname)
 
 @app.route('/view_all_subs')
 def view_all(id=None):
@@ -422,114 +479,114 @@ def view_all(id=None):
         all_subs.append(subscription_data[key])
     return render_template('view_all_subs.html', all_subs = all_subs)
 
-@app.route('/edit_company/<id>')
-def edit_company(id=None):
-    global company_data
-    i = company_data[id]
-    return render_template('edit_company.html', i = i)
+# @app.route('/edit_company/<id>')
+# def edit_company(id=None):
+#     global company_data
+#     i = company_data[id]
+#     return render_template('edit_company.html', i = i)
 
-@app.route('/edit_subscription/<id>')
-def edit_subscription(id=None):
-    global subscription_data
-    i = subscription_data[id]
-    cname = company_data[i["cid"]]["cname"]
-    return render_template('edit_subscription.html', i = i, cname = cname)
+# @app.route('/edit_subscription/<id>')
+# def edit_subscription(id=None):
+#     global subscription_data
+#     i = subscription_data[id]
+#     cname = company_data[i["cid"]]["cname"]
+#     return render_template('edit_subscription.html', i = i, cname = cname)
 
-@app.route('/save_data_company', methods=['GET', 'POST'])
-def save_data_company():
-    global company_data
-    global company_id
+# @app.route('/save_data_company', methods=['GET', 'POST'])
+# def save_data_company():
+#     global company_data
+#     global company_id
     
-    json_data = request.get_json()
-    cname = json_data["cname"]
-    email = json_data["email"]
+#     json_data = request.get_json()
+#     cname = json_data["cname"]
+#     email = json_data["email"]
 
-    company_id += 1
-    new_name_entry = {
-        "cid": str(company_id),
-        "cname": cname,
-        "email": email
-    }
-    company_data[str(company_id)]=new_name_entry
+#     company_id += 1
+#     new_name_entry = {
+#         "cid": str(company_id),
+#         "cname": cname,
+#         "email": email
+#     }
+#     company_data[str(company_id)]=new_name_entry
 
-    # send back the WHOLE array of data, so the client can redisplay it
-    return jsonify(data=company_data, id_add = str(company_id))
+#     # send back the WHOLE array of data, so the client can redisplay it
+#     return jsonify(data=company_data, id_add = str(company_id))
 
-@app.route('/save_data_subscription', methods=['GET', 'POST'])
-def save_data_subscription():
-    global subscription_data
-    global subscription_id
+# @app.route('/save_data_subscription', methods=['GET', 'POST'])
+# def save_data_subscription():
+#     global subscription_data
+#     global subscription_id
     
-    json_data = request.get_json()
-    cid = json_data["cid"]
-    subtype = json_data["subtype"]
-    substa = json_data["substa"]
-    nddate = json_data["nddate"]
-    sdate = json_data["sdate"]
-    binfo = json_data["binfo"]
+#     json_data = request.get_json()
+#     cid = json_data["cid"]
+#     subtype = json_data["subtype"]
+#     substa = json_data["substa"]
+#     nddate = json_data["nddate"]
+#     sdate = json_data["sdate"]
+#     binfo = json_data["binfo"]
     
-    subscription_id += 1
-    new_name_entry = {
-        "sid": str(subscription_id),
-        "cid": cid,
-        "subtype": subtype,
-        "substa": substa,
-        "nddate": nddate,
-        "sdate": sdate,
-        "binfo": binfo
-    }
-    subscription_data[str(subscription_id)]=new_name_entry
+#     subscription_id += 1
+#     new_name_entry = {
+#         "sid": str(subscription_id),
+#         "cid": cid,
+#         "subtype": subtype,
+#         "substa": substa,
+#         "nddate": nddate,
+#         "sdate": sdate,
+#         "binfo": binfo
+#     }
+#     subscription_data[str(subscription_id)]=new_name_entry
 
-    # send back the WHOLE array of data, so the client can redisplay it
-    return jsonify(data=subscription_data, id_add = str(subscription_id))
+#     # send back the WHOLE array of data, so the client can redisplay it
+#     return jsonify(data=subscription_data, id_add = str(subscription_id))
 
-@app.route('/edit_company/save_edit', methods=['GET', 'POST'])
-def save_edit_comp():
-    global company_data
+# @app.route('/edit_company/save_edit', methods=['GET', 'POST'])
+# def save_edit_comp():
+#     global company_data
     
-    json_data = request.get_json()
-    edit_id = json_data["id"]
-    name = json_data["name"]
-    email = json_data["email"]
+#     json_data = request.get_json()
+#     edit_id = json_data["id"]
+#     name = json_data["name"]
+#     email = json_data["email"]
 
-    new_name_entry = {
-        "cid": edit_id,
-        "cname": name,
-        "email": email
-    }
+#     new_name_entry = {
+#         "cid": edit_id,
+#         "cname": name,
+#         "email": email
+#     }
 
-    company_data[str(edit_id)]=new_name_entry
+#     company_data[str(edit_id)]=new_name_entry
 
-    # send back the WHOLE array of data, so the client can redisplay it
-    return jsonify(data=company_data, id_edit = str(edit_id))
+#     # send back the WHOLE array of data, so the client can redisplay it
+#     return jsonify(data=company_data, id_edit = str(edit_id))
 
-@app.route('/edit_subscription/save_edit', methods=['GET', 'POST'])
-def save_edit_subs():
-    global subscription_data
+# @app.route('/edit_subscription/save_edit', methods=['GET', 'POST'])
+# def save_edit_subs():
+#     global subscription_data
     
-    json_data = request.get_json()
-    edit_id = json_data["id"]
-    cid = subscription_data[str(edit_id)]['cid']
-    subtype = json_data["subtype"]
-    substa = json_data["substa"]
-    nddate = json_data["nddate"]
-    sdate = json_data["sdate"]
-    binfo = json_data["binfo"]
+#     json_data = request.get_json()
+#     edit_id = json_data["id"]
+#     cid = subscription_data[str(edit_id)]['cid']
+#     subtype = json_data["subtype"]
+#     substa = json_data["substa"]
+#     nddate = json_data["nddate"]
+#     sdate = json_data["sdate"]
+#     binfo = json_data["binfo"]
 
-    new_name_entry = {
-        "sid": edit_id,
-        "cid": cid,
-        "subtype": subtype,
-        "substa": substa,
-        "nddate": nddate,
-        "sdate": sdate,
-        "binfo": binfo
-    }
+#     new_name_entry = {
+#         "sid": edit_id,
+#         "cid": cid,
+#         "subtype": subtype,
+#         "substa": substa,
+#         "nddate": nddate,
+#         "sdate": sdate,
+#         "binfo": binfo
+#     }
 
-    subscription_data[str(edit_id)]=new_name_entry
+#     subscription_data[str(edit_id)]=new_name_entry
 
-    # send back the WHOLE array of data, so the client can redisplay it
-    return jsonify(data=subscription_data, id_edit = str(edit_id))
+#     # send back the WHOLE array of data, so the client can redisplay it
+#     return jsonify(data=subscription_data, id_edit = str(edit_id))
 
 @app.route('/member-signup', methods=['GET','POST'])
 def member_signup():

@@ -1,3 +1,4 @@
+<script src="../static/manage_members.js"></script>
 {% extends "layout.html" %}
 
 {% block content %}
@@ -45,6 +46,7 @@
                     <th>Billing Info</th>
                     <th>Last Action</th>
                     <th>Last Action Date</th>
+                    <th>Modify</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,10 +61,133 @@
                     <td>{{item['billing_info']}}</td>
                     <td>{{item['last_action']}}</td>
                     <td>{{item['last_action_date']}}</td>
+                    <td><button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#submodifyModal{{ loop.index }}"><i class="fas fa-edit"></i></button></td> 
                 </tr>
+
+                <!-- Modal for each row -->
+                <div class="modal fade" id="submodifyModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="submodifyModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="submodifyModalLabel">Modify Member's Subscription Information</h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Modify form with input fields -->
+                                <form>
+                                    <div class="form-group">
+                                        <label for="submodifiedName{{ loop.index }}">Subscription Name:</label>
+                                        <input type="text" class="form-control" id="submodifiedName{{ loop.index }}" value="{{ item['subscription_name'] }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="submodifiedType{{ loop.index }}">Subscription Type:</label>
+                                        <select class="form-control" id="submodifiedType{{ loop.index }}" name="submodifiedType{{ loop.index }}" >
+                                            <option value="general" {% if item['subscription_type']  == "general" %} selected {% endif %} >General</option>
+                                            <option value="plus" {% if item['subscription_type']  == "plus" %} selected {% endif %} >Plus</option>
+                                            <option value="pro" {% if item['subscription_type']  == "pro" %} selected {% endif %} >Pro</option>
+                                            <option value="free" {% if item['subscription_type']  == "free" %} selected {% endif %} >Free</option>
+                                            <option value="yearly" {% if item['subscription_type']  == "yearly" %} selected {% endif %} >Yearly</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="submodifiedStatus{{ loop.index }}">Subscription Status:</label>
+                                        <select class="form-control" id="submodifiedStatus{{ loop.index }}" name="submodifiedStatus{{ loop.index }}" >
+                                            <option value="activated" {% if item['subscription_status']  == "activated" %} selected {% endif %} >Activated</option>
+                                            <option value="canceled" {% if item['subscription_status']  == "canceled" %} selected {% endif %} >Canceled</option>
+                                            <option value="suspended" {% if item['subscription_status']  == "suspended" %} selected {% endif %} >Suspended</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="submodifiedStartDate{{ loop.index }}">Subscription Start Date:</label>
+                                        <input type="datetime-local" class="form-control" id="submodifiedStartDate{{ loop.index }}" value="{{ item['start_date'] }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="submodifiedDueDate{{ loop.index }}">Subscription Due Date:</label>
+                                        <input type="datetime-local" class="form-control" id="submodifiedDueDate{{ loop.index }}" value="{{ item['next_due_date'] }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="submodifiedBilling{{ loop.index }}">Billing Info:</label>
+                                        <input type="text" class="form-control" id="submodifiedBilling{{ loop.index }}" value="{{ item['billing_info'] }}">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="submodifySaveChanges('{{url_for('admin_change_member_sub')}}', '{{ item['subscription_id'] }}','{{ loop.index }}', '{{ json_profile.email }}')">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </tbody>
     </div>
+
+    <div class="text-center">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#subAddModal">Add New Subscription</button>
+    </div>
+
+    <!-- Modal for add new subscription -->
+    <div class="modal fade" id="subAddModal" tabindex="-1" role="dialog" aria-labelledby="subAddModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="subAddModal">Add New Subscription For This Member</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Modify form with input fields -->
+                    <form>
+                        <div class="form-group">
+                            <label for="subAddModalName">Subscription Name:</label>
+                            <input type="text" class="form-control" id="subAddModalName" placeholder="subscription name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subAddModalType">Subscription Type:</label>
+                            <select class="form-control" id="subAddModalType" name="subAddModalType" required>
+                                <option value="general">General</option>
+                                <option value="plus">Plus</option>
+                                <option value="pro">Pro</option>
+                                <option value="free">Free</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subAddModalStatus">Subscription Status:</label>
+                            <select class="form-control" id="subAddModalStatus" name="subAddModalStatus" required>
+                                <option value="activated">Activated</option>
+                                <option value="canceled">Canceled</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subAddModalStartDate">Subscription Start Date:</label>
+                            <input type="datetime-local" class="form-control" id="subAddModalStartDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subAddModalDueDate">Subscription Due Date:</label>
+                            <input type="datetime-local" class="form-control" id="subAddModalDueDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subAddModalBilling">Billing Info:</label>
+                            <input type="text" class="form-control" id="subAddModalBilling" placeholder="billing info" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="subAddSaveChanges('{{url_for('add_subs')}}', '{{ json_profile.email }}')">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 
 </div>
