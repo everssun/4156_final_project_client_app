@@ -1,0 +1,55 @@
+<script src="../static/manage_members.js"></script>
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+{% endwith %}
+
+<div class="navbar-nav">
+    <a class="nav-link" href="/admin-center">Back</a>
+</div>
+
+<div class="container">
+    <form method="post">
+        <h2 class="text-center">View Due Subscriptions</h2>
+        <div class="mb-3">
+            <label for="due_in" class="form-label">Due in</label>
+            <input type="number" class="form-control" id="due_in" name="due_in" required>
+            <span>days</span>
+        </div>
+        <div class="mb-3">
+            <label for="sub_name" class="form-label">Subscription Name:</label>
+            <input type="text" class="form-control" id="sub_name" name="sub_name" placeholder="subscription name" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Search</button>
+    </form>
+</div>
+
+{% if json%}
+<div class="container mt-3">
+    <h3>Result of Member Emails</h3>
+    <ul>
+        {% for i in range (number) %}
+            <li>{{ json[i|string] }}</li>
+        {% endfor %}
+    </ul>
+    
+    <div class="text-center">
+        <button type="button" class="btn btn-primary" onclick="sendEmailReminder('{{url_for('send_due_emails')}}')">Send Email Reminders</button>
+    </div>
+</div>
+
+
+
+{% endif %}
+
+
+{% endblock %}

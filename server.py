@@ -13,25 +13,7 @@ company_id = 1
 subscription_id = 1
 cookies = ""
 
-# company_data = {
-# 	"1":{
-# 		"cid": "1",
-# 		"cname": "CompanyA",
-# 		"email": "1@gmail.com"
-#         }
-# }
-
-# subscription_data = {
-# 	"1":{
-#         "sid": "1",
-# 		"cid": "1",
-# 		"subtype": "Free",
-# 		"substa": "active",
-# 		"nddate": "2023-10-29 00:00:00",
-# 		"sdate": "2023-9-29 00:00:00",
-# 		"binfo": "sth"
-#         }
-# }
+REMINDER_JSON = None
 
 # localhost
 service_url = "http://localhost:3000"
@@ -495,6 +477,10 @@ def view_all_subs():
     
 @app.route('/analyzer', methods=['GET', 'POST'])
 def analyzer():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
     if request.method == 'POST':
         recipient_email = request.form['analysisEmail']
 
@@ -521,6 +507,71 @@ def analyzer():
                         # Handle any exceptions that may occur during the request
                         return jsonify({'error': str(e)})
     return render_template('analyzer.html')
+
+@app.route('/notification-center', methods=['GET', 'POST'])
+def notification_center():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+
+    if request.method == 'POST':
+        due_in = request.form['due_in']
+        sub_name = request.form['sub_name']
+
+
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+        }
+
+        try:
+            response = requests.get(service_url+f"/company/getExpiringSubscriptionByTime?subscription_name={sub_name}&days={due_in}", headers=headers)
+            api_data = response.content
+            
+            if response.status_code == 200:
+               response_data = response.json()
+               num_recipients = int(response_data.get('number'))
+               global REMINDER_JSON
+               REMINDER_JSON = response_data 
+               print(response_data)
+               print("global save")
+               return render_template('notification_center.html', number=num_recipients, json=response_data)
+            else:
+                # If the request was not successful, return an error message
+                print(f"Send Notification error:{api_data}")
+                flash(f'Send Notification error:{api_data}, please try again or cantact the service provider.', 'warning')
+        except Exception as e:
+                        # Handle any exceptions that may occur during the request
+                        return jsonify({'error': str(e)})
+    return render_template('notification_center.html', number=None, json=None)
+
+@app.route('/send-due-emails', methods=['GET', 'POST'])
+def send_due_emails():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+    
+ 
+    headers = {
+        'Authorization': f'Bearer {jwt_token}',
+    }
+    print(REMINDER_JSON)
+    try:
+        response = requests.post(service_url+"/company/sendReminder", headers=headers, json=REMINDER_JSON)
+        api_data = response.content
+        
+        if response.status_code == 200:
+            flash('Email send successfully to members', 'info')
+        else:
+            # If the request was not successful, return an error message
+            print(f"Send emails error:{api_data}")
+            flash(f'Send emails error:{api_data}, please try again or cantact the service provider.', 'warning')
+    except Exception as e:
+                    # Handle any exceptions that may occur during the request
+                    return jsonify({'error': str(e)})
+    return render_template('notification_center.html', number=None, json=None)
+
+
+
 
 @app.route('/member-signup', methods=['GET','POST'])
 def member_signup():

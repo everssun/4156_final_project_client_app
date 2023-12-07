@@ -111,3 +111,9 @@ function allsubmodifySaveChanges(url, subscription_id, index) {
     document.body.appendChild(form);
     form.submit();
 }
+
+// ---- For notification_center.html ----
+function sendEmailReminder(url) {
+    console.log("js func called")
+    window.location.href = url;
+}
