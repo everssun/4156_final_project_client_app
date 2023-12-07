@@ -117,3 +117,19 @@ function sendEmailReminder(url) {
     console.log("js func called")
     window.location.href = url;
 }
+
+// ---- For member_center.hrml ----
+function membersubmodifySaveChanges(url, subscription_id, index) {
+    // Create a form element
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+
+    // Add hidden input fields
+    addHiddenField(form, 'subscription_status', document.getElementById('membersubmodifiedStatus' + index).value);
+    addHiddenField(form, 'billing_info', document.getElementById('membersubmodifiedBilling' + index).value);
+    addHiddenField(form, 'subscription_id', subscription_id);
+    // Append the form to the document and submit it
+    document.body.appendChild(form);
+    form.submit();
+}

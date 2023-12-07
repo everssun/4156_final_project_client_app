@@ -21,30 +21,6 @@ service_url = "http://localhost:3000"
 jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzI1NzM1NjEsImlzcyI6IlN1Yk1hbmFnZXIiLCJzdWIiOiIyMSJ9.gPSQ91ze5GL4CkCE_sRWyPoQRRcEuQsogoQEJ9cxeQs"
 
 # ROUTES
-@app.route('/test')
-def test():
-    headers = {
-        'Authorization': f'Bearer {jwt_token}',
-        'Content-Type': 'application/json',
-    }
-
-    try:
-        # Make a GET request to the external API
-        response = requests.get(service_url+"/company", headers=headers)
-
-        # Check if the request was successful (HTTP status code 200)
-        if response.status_code == 200:
-            # Parse and return the API response
-            api_data = response.content
-            return api_data
-        else:
-            # If the request was not successful, return an error message
-            return jsonify({'error': f'Request failed with status code {response.status_code}'})
-
-    except Exception as e:
-        # Handle any exceptions that may occur during the request
-        return jsonify({'error': str(e)})
-
 @app.route('/test-session')
 def test_session():
     headers = {
@@ -194,7 +170,7 @@ def admin_view_member(email):
         subscriptions_response = requests.get(service_url+"/admin/subscription/viewSubscriptions", headers=headers, json=request_body)
         subscription_api_data = subscriptions_response.content
 
-        if profile_response.status_code and subscriptions_response.status_code == 200:
+        if profile_response.status_code == 200 and subscriptions_response.status_code == 200:
             subscriptions_json = subscriptions_response.json()
             subscriptions_data = subscriptions_json.get("subscriptions")
             total_subscriptions = int(subscriptions_json.get("total_subscriptions"))
@@ -674,18 +650,70 @@ def member_center():
     
     # Reconstruct the RequestsCookieJar from the list of dictionaries
     cookies = {cookie['name']: cookie['value'] for cookie in cookies_list}
-    print(cookies)
 
     headers = {
         'Authorization': f'Bearer {jwt_token}'
     }
-    response = requests.get(service_url+"/member/profile", headers=headers, cookies=cookies)
-    print(response.json())
-    if response.status_code == 200:
-        return render_template('member_center.html', json_profile=response.json())
+    try:
+        profile_response = requests.get(service_url+"/member/profile", headers=headers, cookies=cookies)
+        profile_data = profile_response.content
+
+        subscriptions_response = requests.get(service_url+"/subscription/viewSubscriptions", headers=headers, cookies=cookies)
+        subscriptions_data = subscriptions_response.content
+
+        if profile_response.status_code == 200 and subscriptions_response.status_code == 200:
+            subscriptions_json = subscriptions_response.json()
+            subscriptions_data = subscriptions_json.get("subscriptions")
+            total_subscriptions = int(subscriptions_json.get("total_subscriptions"))
+            return render_template('member_center.html', json_profile=profile_response.json(), subscriptions_data=subscriptions_data, total_subscriptions=total_subscriptions)
+        else:
+            # If the request was not successful, return an error message
+            print(f"View member's profile error:{profile_data} or {subscriptions_data}")
+            flash(f'View member\'s profile error:{profile_data} or {subscriptions_data}, please try again or cantact the service provider.', 'warning')
+            return redirect(url_for('member_login')) 
+    except Exception as e:
+        # Handle any exceptions that may occur during the request
+        return jsonify({'error': str(e)})
+
+@app.route('/member-change-sub', methods=['GET','POST'])
+def member_change_sub():
+    cookies_list = session.get('cookies')
+
+    if not cookies_list:
+        flash('Please log in to access the member center.', 'warning')
+        return redirect(url_for('member_login')) 
     
-    flash('Your session expired, please login again.', 'warning')
-    return redirect(url_for('member_login')) 
+    # Reconstruct the RequestsCookieJar from the list of dictionaries
+    cookies = {cookie['name']: cookie['value'] for cookie in cookies_list}
+    
+    if request.method == 'POST':
+        subscription_status = request.form['subscription_status']
+        billing_info = request.form['billing_info']
+        subscription_id = request.form['subscription_id']
+
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json',
+        }
+
+        request_body = {
+            "subscription_id" : subscription_id,
+            "subscription_status": subscription_status,
+            "billing_info": billing_info
+        }
+        try:
+            response = requests.patch(service_url+"/subscription/updateSubscription", json=request_body, headers=headers, cookies=cookies)
+            api_data = response.content
+
+            if response.status_code == 200:
+                flash("Update subscription successfullly!", "primary")
+            else:
+                # If the request was not successful, return an error message
+                flash(f'Error: {api_data}', 'warning')
+            return redirect(url_for('member_center'))
+        except Exception as e:
+            # Handle any exceptions that may occur during the request
+            return jsonify({'error': str(e)})       
 
 @app.route('/logout')
 def logout():
