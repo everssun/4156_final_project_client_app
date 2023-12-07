@@ -2,16 +2,6 @@
 
 {% block content %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-{% endwith %}
-
 <nav class="navbar navbar-dark fixed-top navbar-custom" >
     <div class="container-fluid">
         <a class="navbar-brand me-auto" href="#">Admin Center</a>
@@ -23,6 +13,18 @@
         </ul>
     </div>
 </nav>
+
+<div class="mt-5">
+{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+{% endwith %}
+</div>
 
 <div class="container my-5 py-6">
     
@@ -56,17 +58,17 @@
         <br>
 
         <div class="navbar-nav">
-            <a class="nav-link" href="/add_subs">Add subscription</a>
+            <a class="nav-link" href="/add-subs">Add subscription</a>
         </div>
         <br>
 
         <div class="navbar-nav">
-            <a class="nav-link" href="/update_subs">Update subscription</a>
+            <a class="nav-link" href="/update-subs">Update subscription</a>
         </div>
         <br>
 
         <div class="navbar-nav">
-            <a class="nav-link" href="/view_all_subs">View All Subscriptions</a>
+            <a class="nav-link" href="/view-all-subs">View All Subscriptions</a>
         </div>
     </div>
 

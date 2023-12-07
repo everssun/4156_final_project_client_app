@@ -112,13 +112,13 @@ def admin_login():
 @app.route('/admin-center')
 def admin_center():
     if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
         return redirect(url_for('admin_login'))
     
     headers = {
         'Authorization': f'Bearer {jwt_token}'
     }
     response = requests.get(service_url+"/company", headers=headers)
-    print(response.json())
    
     return render_template('admin_center.html', json_profile=response.json())
 
@@ -183,8 +183,8 @@ def admin_manage_members():
             return render_template('admin_manage_members.html', data=members_data, total_members=total_members, page=page, page_size=page_size, total_pages=total_pages)
         else:
                 # If the request was not successful, return an error message
-                print(f"Update profile error:{api_data}")
-                flash(f'Update profile error:{api_data}, please try again or cantact the service provider.', 'warning')
+                print(f"Get Members error:{api_data}")
+                flash(f'Get Members error:{api_data}, please try again or cantact the service provider.', 'warning')
                 return redirect(url_for('admin_center')) 
     except Exception as e:
                     # Handle any exceptions that may occur during the request
@@ -310,6 +310,7 @@ def admin_change_member_sub():
         billing_info = request.form['billing_info']
         subscription_id = request.form['subscription_id']
         email = request.form['email']
+        redirect_url = request.form['redirect_url']
 
         headers = {
             'Authorization': f'Bearer {jwt_token}',
@@ -331,33 +332,27 @@ def admin_change_member_sub():
             api_data = response.content
 
             if response.status_code == 200:
-                return redirect(url_for('admin_view_member', email=email)) 
+                if redirect_url == 'admin_view_member':
+                    return redirect(url_for('admin_view_member', email=email))
+                return redirect(url_for(redirect_url))
             else:
                 # If the request was not successful, return an error message
                 print(f"Update Member's Subscription error:{api_data}")
                 flash(f'Update Member\'s Subscription error:{api_data}, please try again or cantact the service provider.', 'warning')
-                return redirect(url_for('admin_view_member', email=email)) 
+                if redirect_url == 'admin_view_member':
+                    return redirect(url_for('admin_view_member', email=email))
+                return redirect(url_for(redirect_url))
         except Exception as e:
                         # Handle any exceptions that may occur during the request
                         return jsonify({'error': str(e)})
-    return redirect(url_for('admin_view_member', email=email))  
+    return redirect(url_for(redirect_url)) 
 
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('authenticated', None)
     return redirect(url_for('admin_login'))
-    
-# @app.route('/add_company')
-# def add_company():
-#     global company_data
-#     return render_template('add_company.html', d=company_data)
 
-# @app.route('/add_subscription')
-# def add_susbcription():
-#     global subscription_data
-#     return render_template('add_subscription.html', d=subscription_data)
-
-@app.route('/add_subs', methods=['GET','POST'])
+@app.route('/add-subs', methods=['GET','POST'])
 def add_subs():
     if not session.get('authenticated'):
         flash('You don\'t have permission, please log in as admin to continue', 'warning')
@@ -413,180 +408,92 @@ def add_subs():
             
     return render_template('add_subs.html')
 
-@app.route('/update_subs', methods=['GET','POST'])
+@app.route('/update-subs', methods=['GET','POST'])
 def update_subs():
     if not session.get('authenticated'):
         flash('You don\'t have permission, please log in as admin to continue', 'warning')
         return redirect(url_for('admin_login'))
     
     if request.method == 'POST':
-        mem_email = request.form.get('mem_email')
-        subs_name = request.form.get('subs_name')
-        new_act = request.form.get('new_act')
-        
+        subscription_name = request.form['subs_name']
+        subscription_status = request.form['subs_sta']
+        subscription_type = request.form['subs_type']
+        start_date = request.form['start_date']
+        next_due_date = request.form['next_date']
+        billing_info = request.form['bill_info']
+        subscription_id = request.form['subs_id']
+
         headers = {
             'Authorization': f'Bearer {jwt_token}',
             'Content-Type': 'application/json',
         }
 
         request_body = {
-            "email" : mem_email,
-            "subscription_name" : subs_name,
-            "new_action" : new_act
+            "subscription_id" : subscription_id,
+            "subscription_name" : subscription_name,
+            "subscription_status": subscription_status,
+            "subscription_type": subscription_type,
+            "start_date": start_date,
+            "next_due_date": next_due_date,
+            "billing_info": billing_info
         }
 
         try:
             # Make a GET request to the external API
-            response = requests.patch(service_url+"/subscription/updateSubscription", json=request_body, headers=headers)
+            response = requests.patch(service_url+"/admin/subscription/updateSubscription", json=request_body, headers=headers)
             api_data = response.content
-            print(api_data)
+
             
             if response.status_code == 200:
+                flash("Update subscription successfullly!", "primary")
                 return redirect(url_for('admin_center'))
             else:
                 # If the request was not successful, return an error message
-                print(f"subscription update error:{api_data}")
-                flash('This subscription is not found, please check the email and subscription name', 'warning')
+                flash(f'Error: {api_data}', 'warning')
                 return redirect(url_for('update_subs')) 
 
         except Exception as e:
             # Handle any exceptions that may occur during the request
             return jsonify({'error': str(e)})
-            
-            
+                  
     return render_template('update_subs.html')
 
-# @app.route('/view_company/<id>')
-# def view_company(id=None):
-#     global company_data
-#     i = company_data[id]
-#     return render_template('view_company.html', i = i)
+@app.route('/view-all-subs')
+def view_all_subs():
+    if not session.get('authenticated'):
+        flash('You don\'t have permission, please log in as admin to continue', 'warning')
+        return redirect(url_for('admin_login'))
+     
+    headers = {
+        'Authorization': f'Bearer {jwt_token}',
+    }
 
-# @app.route('/view_subs/<id>')
-# def view_subscription(id=None):
-#     global subscription_data
-#     global company_data
-#     i = subscription_data[id]
-#     cid = subscription_data[id]["cid"]
-#     cname = company_data[cid]["cname"]
-#     return render_template('view_subs.html', i = i, name = cname)
-
-@app.route('/view_all_subs')
-def view_all(id=None):
-    global subscription_data
-    all_subs = []
-    for key in subscription_data:
-        all_subs.append(subscription_data[key])
-    return render_template('view_all_subs.html', all_subs = all_subs)
-
-# @app.route('/edit_company/<id>')
-# def edit_company(id=None):
-#     global company_data
-#     i = company_data[id]
-#     return render_template('edit_company.html', i = i)
-
-# @app.route('/edit_subscription/<id>')
-# def edit_subscription(id=None):
-#     global subscription_data
-#     i = subscription_data[id]
-#     cname = company_data[i["cid"]]["cname"]
-#     return render_template('edit_subscription.html', i = i, cname = cname)
-
-# @app.route('/save_data_company', methods=['GET', 'POST'])
-# def save_data_company():
-#     global company_data
-#     global company_id
+    page = request.args.get('page', 1, type=int)
+    page_size = 10  
     
-#     json_data = request.get_json()
-#     cname = json_data["cname"]
-#     email = json_data["email"]
-
-#     company_id += 1
-#     new_name_entry = {
-#         "cid": str(company_id),
-#         "cname": cname,
-#         "email": email
-#     }
-#     company_data[str(company_id)]=new_name_entry
-
-#     # send back the WHOLE array of data, so the client can redisplay it
-#     return jsonify(data=company_data, id_add = str(company_id))
-
-# @app.route('/save_data_subscription', methods=['GET', 'POST'])
-# def save_data_subscription():
-#     global subscription_data
-#     global subscription_id
+    # Send request to service with page and page size parameters
+    pagination_url = f"{service_url}/subscription/allSubscriptions?page={page}&pagesize={page_size}"
     
-#     json_data = request.get_json()
-#     cid = json_data["cid"]
-#     subtype = json_data["subtype"]
-#     substa = json_data["substa"]
-#     nddate = json_data["nddate"]
-#     sdate = json_data["sdate"]
-#     binfo = json_data["binfo"]
+    try:
+        response = requests.get(pagination_url, headers=headers)
+        api_data = response.content
+        
+        if response.status_code == 200:
+            paginated_data = response.json()
+            subscriptions_data = paginated_data.get("subscriptions")
+            total_subscriptions = int(paginated_data.get("total_subscriptions"))
+            total_pages = int(paginated_data.get("total_pages"))
+            return render_template('view_all_subs.html', data=subscriptions_data, total_subscriptions=total_subscriptions, page=page, page_size=page_size, total_pages=total_pages)
+        else:
+                # If the request was not successful, return an error message
+                print(f"Get Members error:{api_data}")
+                flash(f'Get Members error:{api_data}, please try again or cantact the service provider.', 'warning')
+                return redirect(url_for('admin_center')) 
+    except Exception as e:
+                    # Handle any exceptions that may occur during the request
+                    return jsonify({'error': str(e)})
     
-#     subscription_id += 1
-#     new_name_entry = {
-#         "sid": str(subscription_id),
-#         "cid": cid,
-#         "subtype": subtype,
-#         "substa": substa,
-#         "nddate": nddate,
-#         "sdate": sdate,
-#         "binfo": binfo
-#     }
-#     subscription_data[str(subscription_id)]=new_name_entry
-
-#     # send back the WHOLE array of data, so the client can redisplay it
-#     return jsonify(data=subscription_data, id_add = str(subscription_id))
-
-# @app.route('/edit_company/save_edit', methods=['GET', 'POST'])
-# def save_edit_comp():
-#     global company_data
     
-#     json_data = request.get_json()
-#     edit_id = json_data["id"]
-#     name = json_data["name"]
-#     email = json_data["email"]
-
-#     new_name_entry = {
-#         "cid": edit_id,
-#         "cname": name,
-#         "email": email
-#     }
-
-#     company_data[str(edit_id)]=new_name_entry
-
-#     # send back the WHOLE array of data, so the client can redisplay it
-#     return jsonify(data=company_data, id_edit = str(edit_id))
-
-# @app.route('/edit_subscription/save_edit', methods=['GET', 'POST'])
-# def save_edit_subs():
-#     global subscription_data
-    
-#     json_data = request.get_json()
-#     edit_id = json_data["id"]
-#     cid = subscription_data[str(edit_id)]['cid']
-#     subtype = json_data["subtype"]
-#     substa = json_data["substa"]
-#     nddate = json_data["nddate"]
-#     sdate = json_data["sdate"]
-#     binfo = json_data["binfo"]
-
-#     new_name_entry = {
-#         "sid": edit_id,
-#         "cid": cid,
-#         "subtype": subtype,
-#         "substa": substa,
-#         "nddate": nddate,
-#         "sdate": sdate,
-#         "binfo": binfo
-#     }
-
-#     subscription_data[str(edit_id)]=new_name_entry
-
-#     # send back the WHOLE array of data, so the client can redisplay it
-#     return jsonify(data=subscription_data, id_edit = str(edit_id))
 
 @app.route('/member-signup', methods=['GET','POST'])
 def member_signup():

@@ -60,7 +60,7 @@ function submodifySaveChanges(url, subscription_id, index , email) {
     addHiddenField(form, 'billing_info', document.getElementById('submodifiedBilling' + index).value);
     addHiddenField(form, 'subscription_id', subscription_id);
     addHiddenField(form, 'email', email);
-
+    addHiddenField(form, 'redirect_url', 'admin_view_member')
     // Append the form to the document and submit it
     document.body.appendChild(form);
     form.submit();
@@ -87,4 +87,27 @@ function subAddSaveChanges(url, email){
     document.body.appendChild(form);
     form.submit();
 
+}
+
+// ---- For view_all_subs.html ----
+
+function allsubmodifySaveChanges(url, subscription_id, index) {
+    // Create a form element
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+
+    // Add hidden input fields
+    addHiddenField(form, 'subscription_name', document.getElementById('allsubmodifiedName' + index).value);
+    addHiddenField(form, 'subscription_status', document.getElementById('allsubmodifiedStatus' + index).value);
+    addHiddenField(form, 'subscription_type', document.getElementById('allsubmodifiedType' + index).value);
+    addHiddenField(form, 'start_date', document.getElementById('allsubmodifiedStartDate' + index).value);
+    addHiddenField(form, 'next_due_date', document.getElementById('allsubmodifiedDueDate' + index).value);
+    addHiddenField(form, 'billing_info', document.getElementById('allsubmodifiedBilling' + index).value);
+    addHiddenField(form, 'subscription_id', subscription_id);
+    addHiddenField(form, 'email', 'NA'); // placeholder
+    addHiddenField(form, 'redirect_url', 'view_all_subs');
+    // Append the form to the document and submit it
+    document.body.appendChild(form);
+    form.submit();
 }

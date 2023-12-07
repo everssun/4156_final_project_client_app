@@ -1,17 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+{% endwith %}
 <div class="navbar-nav">
     <a class="nav-link" href="/admin-center">Back</a>
 </div>
 
 <div class="container">
     <form method="post" action="{{ url_for('update_subs') }}">
-        <h2 class="text-center">Enter the NEW subscription's Info:</h2>
+        <h2 class="text-center">Update a subscription's Info:</h2>
 
         <div class="mb-3">
-            <label for="mem_email" class="form-label">Member Email:</label>
-            <input type="text" class="form-control" id="mem_email" name="mem_email" placeholder="member email" required>
+            <label for="mem_email" class="form-label">Subscription ID:</label>
+            <input type="text" class="form-control" id="subs_id" name="subs_id" placeholder="subscription id" required>
         </div>
         <div class="col-md-12 upb"></div>
 
@@ -20,13 +30,46 @@
             <input type="text" class="form-control" id="subs_name" name="subs_name" placeholder="subscription name" required>
         </div>
         <div class="col-md-12 upb"></div>
-
+        
         <div class="mb-3">
-            <label for="new_act" class="form-label">New Action:</label>
-            <input type="text" class="form-control" id="new_act" name="new_act" placeholder="new action" required>
+            <label for="subs_type" class="form-label">Subscription Type:</label>
+            <select class="form-control" id="subs_type" name="subs_type" required>
+                <option value="general">General</option>
+                <option value="plus">Plus</option>
+                <option value="pro">Pro</option>
+                <option value="free">Free</option>
+                <option value="yearly">Yearly</option>
+            </select>
         </div>
         <div class="col-md-12 upb"></div>
 
+        <div class="mb-3">
+            <label for="subs_sta" class="form-label">Subscription Status:</label>
+            <select class="form-control" id="subs_sta" name="subs_sta" required>
+                <option value="activated">Activated</option>
+                <option value="canceled">Canceled</option>
+                <option value="suspended">Suspended</option>
+            </select>
+        </div>
+        <div class="col-md-12 upb"></div>
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Start Date:</label>
+            <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+        </div>
+        <div class="col-md-12 upb"></div>
+        <div class="col-md-12 upb"></div>
+        <div class="mb-3">
+            <label for="next_date" class="form-label">Next Due Date:</label>
+            <input type="datetime-local" class="form-control" id="next_date" name="next_date" required>
+        </div>
+       
+        <div class="col-md-12 upb"></div>
+
+        <div class="mb-3">
+            <label for="bill_info" class="form-label">Billing Info:</label>
+            <input type="text" class="form-control" id="bill_info" name="bill_info" placeholder="billing info" required>
+        </div>
+        
         <button type="submit" class="btn btn-primary btn-block">Submit</button>
 
     </form>
