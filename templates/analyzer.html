@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+{% endwith %}
+
+<div class="navbar-nav">
+    <a class="nav-link" href="/admin-center">Back</a>
+</div>
+
+<div class="container">
+    <form method="post">
+        <h2 class="text-center">Get an Email of Your Member Statistics</h2>
+        <div class="mb-3">
+            <label for="analysisEmail" class="form-label">Email</label>
+            <input type="text" class="form-control" id="analysisEmail" name="analysisEmail" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send</button>
+    </form>
+</div>
+
+
+{% endblock %}

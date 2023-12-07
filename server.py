@@ -493,7 +493,34 @@ def view_all_subs():
                     # Handle any exceptions that may occur during the request
                     return jsonify({'error': str(e)})
     
-    
+@app.route('/analyzer', methods=['GET', 'POST'])
+def analyzer():
+    if request.method == 'POST':
+        recipient_email = request.form['analysisEmail']
+
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+            'Content-Type': 'application/json',
+        }
+
+        request_body = {
+            'email' : recipient_email
+        }
+
+        try:
+            response = requests.post(service_url+"/company/analyzeSubDuration", headers=headers, json=request_body)
+            api_data = response.content
+            
+            if response.status_code == 200:
+                flash('Send email successfully', 'info')
+            else:
+                # If the request was not successful, return an error message
+                print(f"Send Analysis error:{api_data}")
+                flash(f'Send Analysis error:{api_data}, please try again or cantact the service provider.', 'warning')
+        except Exception as e:
+                        # Handle any exceptions that may occur during the request
+                        return jsonify({'error': str(e)})
+    return render_template('analyzer.html')
 
 @app.route('/member-signup', methods=['GET','POST'])
 def member_signup():
