@@ -119,16 +119,44 @@ function sendEmailReminder(url) {
 }
 
 // ---- For member_center.hrml ----
+function trackChanges(elementId) {
+    var element = $("#" + elementId);
+    var originalValue = element.data("original-value");
+    var currentValue = element.val();
+
+    return {
+        elementId: elementId,
+        originalValue: originalValue,
+        currentValue: currentValue,
+        hasChanged: originalValue !== currentValue
+    };
+}
+
 function membersubmodifySaveChanges(url, subscription_id, index) {
     // Create a form element
     var form = document.createElement('form');
     form.method = 'POST';
     form.action = url;
 
+    var statusChanges = trackChanges("membersubmodifiedStatus" + index);
+    var billingChanges = trackChanges("membersubmodifiedBilling" + index);
+    
+    var action = "";
+
+    if (statusChanges.hasChanged) {
+        action += "Subscription status changed from -" + statusChanges.originalValue + "- to -" + statusChanges.currentValue + "-. ";
+    }
+
+    if (billingChanges.hasChanged) {
+        action += "Billing info changed from -" + billingChanges.originalValue + "- to -" + billingChanges.currentValue + "-. ";
+    }
+
+    console.log(action);
     // Add hidden input fields
     addHiddenField(form, 'subscription_status', document.getElementById('membersubmodifiedStatus' + index).value);
     addHiddenField(form, 'billing_info', document.getElementById('membersubmodifiedBilling' + index).value);
     addHiddenField(form, 'subscription_id', subscription_id);
+    addHiddenField(form, 'action', action);
     // Append the form to the document and submit it
     document.body.appendChild(form);
     form.submit();

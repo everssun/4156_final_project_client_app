@@ -685,11 +685,12 @@ def member_change_sub():
     
     # Reconstruct the RequestsCookieJar from the list of dictionaries
     cookies = {cookie['name']: cookie['value'] for cookie in cookies_list}
-    
+
     if request.method == 'POST':
         subscription_status = request.form['subscription_status']
         billing_info = request.form['billing_info']
         subscription_id = request.form['subscription_id']
+        action = request.form['action']
 
         headers = {
             'Authorization': f'Bearer {jwt_token}',
@@ -704,12 +705,19 @@ def member_change_sub():
         try:
             response = requests.patch(service_url+"/subscription/updateSubscription", json=request_body, headers=headers, cookies=cookies)
             api_data = response.content
+            
+            action_body = {
+                "subscription_id" : subscription_id,
+                "last_action": action
+            }
+            action_response = requests.patch(service_url+"/subscription/updateSubscriptionAction", json=action_body, headers=headers)
+            action_api_data = action_response.content
 
-            if response.status_code == 200:
+            if response.status_code == 200 and action_response.status_code == 200:
                 flash("Update subscription successfullly!", "primary")
             else:
                 # If the request was not successful, return an error message
-                flash(f'Error: {api_data}', 'warning')
+                flash(f'Error: {api_data} or {action_api_data}', 'warning')
             return redirect(url_for('member_center'))
         except Exception as e:
             # Handle any exceptions that may occur during the request

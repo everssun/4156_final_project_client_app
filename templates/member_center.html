@@ -90,7 +90,7 @@
         
                                     <div class="form-group">
                                         <label for="membersubmodifiedStatus{{ loop.index }}">Subscription Status:</label>
-                                        <select class="form-control" id="membersubmodifiedStatus{{ loop.index }}" name="membersubmodifiedStatus{{ loop.index }}" >
+                                        <select class="form-control" id="membersubmodifiedStatus{{ loop.index }}" name="membersubmodifiedStatus{{ loop.index }}" data-original-value="{{ item['subscription_status'] }}" >
                                             <option value="activated" {% if item['subscription_status']  == "activated" %} selected {% endif %} >Activated</option>
                                             <option value="canceled" {% if item['subscription_status']  == "canceled" %} selected {% endif %} >Canceled</option>
                                             <option value="suspended" {% if item['subscription_status']  == "suspended" %} selected {% endif %} >Suspended</option>
@@ -99,7 +99,7 @@
 
                                     <div class="form-group">
                                         <label for="membersubmodifiedBilling{{ loop.index }}">Billing Info:</label>
-                                        <input type="text" class="form-control" id="membersubmodifiedBilling{{ loop.index }}" value="{{ item['billing_info'] }}">
+                                        <input type="text" class="form-control" id="membersubmodifiedBilling{{ loop.index }}" value="{{ item['billing_info'] }}" data-original-value="{{ item['billing_info'] }}">
                                     </div>
                                 </form>
                             </div>
